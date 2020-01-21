@@ -37,24 +37,18 @@ public class Main2 {
                     @Nullable
                     @Override
                     public Watermark getCurrentWatermark() {
-                        return new Watermark(currentTimestamp == Long.MIN_VALUE ? Long.MIN_VALUE : currentTimestamp - 1);
+                        return new Watermark(currentTimestamp == Long.MIN_VALUE ? Long.MIN_VALUE : currentTimestamp - maxTimeLag);
                     }
 
                     @Override
                     public long extractTimestamp(WordEvent element, long previousElementTimestamp) {
-                        if (element.getTimestamp() > currentTimestamp) {
-                            this.currentTimestamp = element.getTimestamp();
-                        }
-                        return currentTimestamp;
+                        long timestamp = element.getTimestamp();
+                        currentTimestamp = Math.max(timestamp, currentTimestamp);
+                        return timestamp;
                     }
                 });
 
-        data.keyBy(new KeySelector<WordEvent, String>() {
-            @Override
-            public String getKey(WordEvent value) throws Exception {
-                return value.getWord();
-            }
-        })
+        data.keyBy(WordEvent::getWord)
                 .timeWindow(Time.seconds(5))
                 .sum("count")
                 .print();

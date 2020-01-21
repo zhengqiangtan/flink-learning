@@ -5,6 +5,7 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -17,6 +18,8 @@ public class DateUtil {
     public static DateTimeFormatter YYYYMMDD = DateTimeFormat.forPattern("yyyyMMdd");
     public static DateTimeFormatter YYYYMMDDHHMMSS = DateTimeFormat.forPattern("yyyyMMddHHmmss");
     public static DateTimeFormatter YYYY_MM_DD_HH_MM_SS = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
+    public static DateTimeFormatter YYYY_MM_DD_HH_MM_SS_SSS = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS");
+    public static DateTimeFormatter YYYY_MM_DD_HH_MM_SS_SSSZ = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSSZ");
     public static DateTimeFormatter YYYY_MM_DD_HH_MM_SS_0 = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.0");
     public static DateTimeFormatter YYYY_MM_DD_HH_MM = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm");
     public static DateTimeFormatter YYYYMMDD_HH_MM_SS = DateTimeFormat.forPattern("yyyy/MM/dd HH:mm:ss");
@@ -58,6 +61,10 @@ public class DateUtil {
             return YYYY_MM_DD_HH_MM.parseMillis(time);
         } else if (YYYY_MM_DD.equals(dateFormatter)) {
             return YYYY_MM_DD.parseMillis(time);
+        } else if (YYYY_MM_DD_HH_MM_SS_SSS.equals(dateFormatter)) {
+            return YYYY_MM_DD_HH_MM_SS_SSS.parseMillis(time);
+        } else if (YYYY_MM_DD_HH_MM_SS_SSSZ.equals(dateFormatter)) {
+            return YYYY_MM_DD_HH_MM_SS_SSSZ.parseMillis(time);
         }
         return YYYY_MM_DD_HH_MM_SS.parseMillis(time);
     }
@@ -156,4 +163,21 @@ public class DateUtil {
         return DateTime.now().withTimeAtStartOfDay().plusDays(1).minusSeconds(1).toString(YYYYMMDDHHMMSS);
     }
 
+
+    /**
+     * 根据指定的时间戳获取前 l 或者后 l 天的时间戳
+     *
+     * @param timestamp
+     * @param l
+     * @return
+     */
+    public static Long getPastTime(Long timestamp, int l) {
+        if (timestamp == null) {
+            timestamp = System.currentTimeMillis();
+        }
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(timestamp);
+        calendar.set(Calendar.DATE, calendar.get(Calendar.DATE) + l);
+        return format(calendar.getTime());
+    }
 }
